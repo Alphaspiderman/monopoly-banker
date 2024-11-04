@@ -8,7 +8,13 @@ export default function Home() {
   return (
     <div>
       <main className="flex flex-col justify-center items-center min-h-screen">
-        <div className="text-white text-4xl font-bold text-center mt-4">
+        <div className="flex flex-col justify-center items-center">
+          <div className="relative block h-[80vh] w-[100vh]">
+            <Image src="/home.png" alt="image" fill />
+          </div>
+        </div>
+
+        <div className="text-white text-4xl font-bold text-center">
           {gameState ? (
             <>
               <Button>Continue Game</Button>
@@ -17,11 +23,6 @@ export default function Home() {
           ) : (
             <Button>Setup Game</Button>
           )}
-        </div>
-        <div className="flex flex-col justify-center items-center">
-          <div className="relative block h-[80vh] w-[100vh]">
-            <Image src="/home.png" alt="image" fill />
-          </div>
         </div>
       </main>
     </div>
