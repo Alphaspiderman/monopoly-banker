@@ -8,9 +8,10 @@ export default function Home() {
   return (
     <div>
       <main className="flex flex-col justify-center items-center min-h-screen">
-        <div className="flex flex-col justify-center items-center">
-          <div className="relative block h-[80vh] w-[100vh]">
-            <Image src="/home.png" alt="image" fill />
+        <div className="relative w-full h-[80vh] flex justify-center items-center">
+          <Image src="/home.png" alt="image" layout="fill" objectFit="cover" />
+          <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50">
+            <h1 className="text-white text-6xl font-bold">Bank Helper</h1>
           </div>
         </div>
 
