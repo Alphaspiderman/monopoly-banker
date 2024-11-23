@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect } from "react";
 
 export default function Home() {
@@ -18,11 +19,23 @@ export default function Home() {
         <div className="text-white text-4xl font-bold text-center">
           {gameState ? (
             <>
-              <Button>Continue Game</Button>
-              <Button variant="destructive">Reset Data</Button>
+              <Button asChild>
+                <Link href="/game">Continue Game</Link>
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  // Reset Game Data
+                  console.log("Reset Data button clicked");
+                }}
+              >
+                Reset Data
+              </Button>
             </>
           ) : (
-            <Button>Setup Game</Button>
+            <Button asChild>
+              <Link href="/setup">Setup Game</Link>
+            </Button>
           )}
         </div>
       </main>
