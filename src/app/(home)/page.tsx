@@ -7,28 +7,17 @@ export default function Home() {
   const [gameState, setGameState] = useState<string | null>(null);
 
   useEffect(() => {
-    const gameState = localStorage.getItem("game");
+    const gameState = localStorage.getItem("gameData");
     if (gameState) {
       setGameState(gameState);
     }
   }, []);
 
-  // function handleSaveGame() {
-  //   // Simulating a game object
-  //   const newGame = "Game Data";
-
-  //   // Save the game to localStorage
-  //   localStorage.setItem("game", newGame);
-
-  //   // Update state with the new game data
-  //   setGameState(newGame);
-  // }
-
   function resetGame() {
     // Reset Game Data
     console.log("Reset Data button clicked");
     // Save the game to localStorage
-    localStorage.removeItem("game");
+    localStorage.removeItem("gameData");
 
     // Update state with the new game data
     setGameState(null);
@@ -66,15 +55,6 @@ export default function Home() {
                 <Button asChild>
                   <Link href="/setup">Setup Game</Link>
                 </Button>
-                {/* <Button
-                onClick={() => {
-                  // Reset Game Data
-                  console.log("Game Created");
-                  handleSaveGame();
-                }}
-              >
-                Make Game
-              </Button> */}
               </>
             )}
           </div>

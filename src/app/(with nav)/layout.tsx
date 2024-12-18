@@ -4,7 +4,7 @@ export default function NavLayout({ children }: { children: React.ReactNode }) {
   let entries = [
     { name: "Home", href: "/" },
     { name: "Setup", href: "/setup" },
-    { name: "Play", href: "/play" },
+    { name: "Play", href: "/game" },
   ];
 
   return (
