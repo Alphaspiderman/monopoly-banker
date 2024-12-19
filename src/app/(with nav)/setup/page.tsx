@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
   inital_balance: z.number().int().positive().min(500),
-  players: z.array(z.object({ value: z.string().min(2).max(25) })).min(2),
+  players: z.array(z.object({ value: z.string().min(1).max(25) })).min(2),
 });
 
 const defaultValues: Partial<FormValues> = {
@@ -35,6 +35,7 @@ export default function GameSetupPage() {
     defaultValues,
     mode: "onChange",
   });
+
   const { fields, append, remove } = useFieldArray({
     name: "players",
     control: form.control,
@@ -48,18 +49,28 @@ export default function GameSetupPage() {
       alert("Please add atleast 2 players");
       return;
     }
+
     // Ensure that the initial balance is atleast 500
     if (data.inital_balance < 500) {
       alert("Initial balance should be atleast 500");
       return;
     }
-    var gameData = {
+
+    // Create game data
+    var gameData: GameData = {
       player_count: player_count,
       active_player: 0,
-      players: data.players.forEach((element) => {
-        return { name: element.value, balance: data.inital_balance };
-      }),
+      players: [],
     };
+
+    // Add players to the game data
+    for (var i = 0; i < player_count; i++) {
+      gameData.players.push({
+        name: data.players[i].value,
+        balance: data.inital_balance,
+      });
+    }
+
     // Save data in local storage
     localStorage.setItem("gameData", JSON.stringify(gameData));
 
@@ -75,7 +86,7 @@ export default function GameSetupPage() {
         backgroundSize: "cover",
       }}
     >
-      <div className="w-full h-full flex flex-col justify-center items-center bg-black bg-opacity-50">
+      <div className="w-full h-full flex flex-col justify-center items-center dark:bg-black dark:bg-opacity-50 bg-white bg-opacity-10">
         <h1 className="text-4xl font-bold mb-8">Game Setup</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -85,14 +96,17 @@ export default function GameSetupPage() {
                 Set the initial balance for all player. (Minimum 500)
               </FormDescription>
               <FormControl>
-                <Input {...form.register("inital_balance")} />
+                <Input
+                  {...form.register("inital_balance")}
+                  className="border-2 border-blue-500 bg-black bg-opacity-50"
+                />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-500 font-medium" />
             </FormItem>
             <div>
               <FormLabel>Players</FormLabel>
               <FormDescription>Add names of Players.</FormDescription>
-              {fields.length < 8 ? renderEntry() : renderTwoColumns()}
+              {fields.length < 5 ? renderEntry() : renderTwoColumns()}
 
               <Button
                 type="button"
@@ -134,7 +148,7 @@ export default function GameSetupPage() {
                   className="border-2 border-blue-500 bg-black bg-opacity-50"
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-600 font-bold" />
             </FormItem>
           )}
         />
