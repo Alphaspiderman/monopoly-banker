@@ -66,6 +66,7 @@ export default function GameSetupPage() {
     // Add players to the game data
     for (var i = 0; i < player_count; i++) {
       gameData.players.push({
+        id: i,
         name: data.players[i].value,
         balance: data.inital_balance,
       });
