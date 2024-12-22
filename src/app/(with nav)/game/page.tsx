@@ -180,116 +180,18 @@ export default function GamePage() {
           </Table>
         </div>
         <div className="flex space-x-4">
-          <Dialog>
-            <DialogTrigger>Pay Money</DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Paying Money</DialogTitle>
-                <DialogDescription>
-                  Player will be paying a player. Please provide the information
-                  below.
-                </DialogDescription>
-              </DialogHeader>
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmitPay)}
-                  className="space-y-6"
-                >
-                  <FormField
-                    control={form.control}
-                    name="player"
-                    render={({ field }) => (
-                      <>
-                        <FormItem>
-                          <FormLabel>Player</FormLabel>
-                          <FormControl>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button className="w-full text-left">
-                                  {field.value === -1
-                                    ? "Bank"
-                                    : gameData?.players[field.value]?.name ||
-                                      "Select a player"}
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent>
-                                <DropdownMenuItem
-                                  onSelect={() => field.onChange(-1)}
-                                >
-                                  Bank
-                                </DropdownMenuItem>
-                                {gameData?.players
-                                  .filter(
-                                    (_, index) =>
-                                      index !== gameData.active_player
-                                  )
-                                  .map((player, index) => (
-                                    <DropdownMenuItem
-                                      key={index}
-                                      onSelect={() => field.onChange(index)}
-                                    >
-                                      {player.name}
-                                    </DropdownMenuItem>
-                                  ))}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      </>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="amount"
-                    render={({ field }) => {
-                      return (
-                        <>
-                          <FormItem>
-                            <FormLabel>Amount</FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                type="number"
-                                onChange={(e) => {
-                                  field.onChange(parseInt(e.target.value));
-                                }}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        </>
-                      );
-                    }}
-                  />
-                  <DialogClose asChild>
-                    <Button type="submit">Submit</Button>
-                  </DialogClose>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-
-          {/* <Button
-            onClick={() => {
-              console.log("Collect money");
-              // Open a modal to select a player to collect money from and set amount
-            }}
-          >
-            Collect Money
-          </Button> */}
-          <Dialog>
-            <DialogTrigger>Collect Money</DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Collecting Money</DialogTitle>
-                <DialogDescription>
-                  Player will be collecting money from another player. Please
-                  provide the information below.
-                </DialogDescription>
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
+          {showPaymentModal(
+            "Pay Money",
+            "Paying Money",
+            "Player will be paying a player. Please provide the information below.",
+            onSubmitPay
+          )}
+          {showPaymentModal(
+            "Collect Money",
+            "Collecting Money",
+            "Player will be collecting money from a player. Please provide the information below.",
+            onSubmitCollect
+          )}
 
           <Button
             variant="destructive"
@@ -304,4 +206,96 @@ export default function GamePage() {
       </div>
     </main>
   );
+
+  function showPaymentModal(
+    trigger: string,
+    title: string,
+    description: string,
+    onSubmit: (data: z.infer<typeof FormSchema>) => void
+  ) {
+    return (
+      <Dialog>
+        <DialogTrigger>{trigger}</DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{title}</DialogTitle>
+            <DialogDescription>{description}</DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="player"
+                render={({ field }) => (
+                  <>
+                    <FormItem>
+                      <FormLabel>Player</FormLabel>
+                      <FormControl>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button className="w-full text-left">
+                              {field.value === -1
+                                ? "Bank"
+                                : gameData?.players[field.value]?.name ||
+                                  "Select a player"}
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem
+                              onSelect={() => field.onChange(-1)}
+                            >
+                              Bank
+                            </DropdownMenuItem>
+                            {gameData?.players
+                              .filter(
+                                (_, index) => index !== gameData.active_player
+                              )
+                              .map((player, index) => (
+                                <DropdownMenuItem
+                                  key={player.id}
+                                  onSelect={() => field.onChange(player.id)}
+                                >
+                                  {player.name}
+                                </DropdownMenuItem>
+                              ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  </>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => {
+                  return (
+                    <>
+                      <FormItem>
+                        <FormLabel>Amount</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="number"
+                            onChange={(e) => {
+                              field.onChange(parseInt(e.target.value));
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    </>
+                  );
+                }}
+              />
+              <DialogClose asChild>
+                <Button type="submit">Submit</Button>
+              </DialogClose>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 }
