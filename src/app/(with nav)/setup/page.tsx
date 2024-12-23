@@ -59,7 +59,8 @@ export default function GameSetupPage() {
     // Create game data
     var gameData: GameData = {
       player_count: player_count,
-      active_player: 0,
+      player_turn: 0,
+      active_players: player_count,
       players: [],
     };
 
@@ -69,6 +70,7 @@ export default function GameSetupPage() {
         id: i,
         name: data.players[i].value,
         balance: data.inital_balance,
+        bankrupt: false,
       });
     }
 

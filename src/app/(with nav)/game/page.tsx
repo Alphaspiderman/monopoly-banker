@@ -56,12 +56,12 @@ export default function GamePage() {
 
   function onSubmitPay(data: z.infer<typeof FormSchema>) {
     console.log(data);
-    transferMoney(gameData!.active_player, data.player, data.amount);
+    transferMoney(gameData!.player_turn, data.player, data.amount);
   }
 
   function onSubmitCollect(data: z.infer<typeof FormSchema>) {
     console.log(data);
-    transferMoney(gameData!.active_player, data.player, -data.amount);
+    transferMoney(gameData!.player_turn, data.player, -data.amount);
   }
 
   // Load game data from localStorage on component mount
@@ -84,15 +84,13 @@ export default function GamePage() {
   function endTurn() {
     if (gameData) {
       const newActivePlayer =
-        gameData.active_player + 1 >= gameData.player_count
+        gameData.player_turn + 1 >= gameData.player_count
           ? 0
-          : gameData.active_player + 1;
-
+          : gameData.player_turn + 1;
       const updatedGameData = {
         ...gameData,
-        active_player: newActivePlayer,
+        player_turn: newActivePlayer,
       };
-
       localStorage.setItem("gameData", JSON.stringify(updatedGameData));
       setGameData(updatedGameData);
     }
@@ -101,15 +99,28 @@ export default function GamePage() {
   // Function to transfer money between players
   function transferMoney(from: number, to: number, amount: number) {
     if (gameData) {
+      var success = true;
       const players = gameData.players.map((player, index) => {
         if (index === from) {
+          var newBalance = player.balance - amount;
+          if (newBalance < 0) {
+            alert("Whoops! You don't have enough money to make this payment.");
+            success = false;
+            return player;
+          }
           return {
             ...player,
-            balance: player.balance - amount,
+            balance: newBalance,
           };
         }
 
         if (index === to) {
+          var newBalance = player.balance + amount;
+          if (newBalance < 0) {
+            alert("Whoops! You don't have enough money to make this payment.");
+            success = false;
+            return player;
+          }
           return {
             ...player,
             balance: player.balance + amount,
@@ -119,13 +130,15 @@ export default function GamePage() {
         return player;
       });
 
-      const updatedGameData = {
-        ...gameData,
-        players,
-      };
+      if (success) {
+        const updatedGameData = {
+          ...gameData,
+          players: players,
+        };
 
-      localStorage.setItem("gameData", JSON.stringify(updatedGameData));
-      setGameData(updatedGameData);
+        localStorage.setItem("gameData", JSON.stringify(updatedGameData));
+        setGameData(updatedGameData);
+      }
     }
   }
 
@@ -163,7 +176,7 @@ export default function GamePage() {
               {gameData?.players &&
                 highlightActivePlayer(
                   gameData.players,
-                  gameData.active_player
+                  gameData.player_turn
                 ).map((player, index) => (
                   <TableRow
                     key={index}
@@ -196,8 +209,8 @@ export default function GamePage() {
           <Button
             variant="destructive"
             onClick={() => {
-              console.log("End Turn");
               endTurn();
+              console.log("End Turn");
             }}
           >
             End Turn
@@ -248,7 +261,7 @@ export default function GamePage() {
                             </DropdownMenuItem>
                             {gameData?.players
                               .filter(
-                                (_, index) => index !== gameData.active_player
+                                (_, index) => index !== gameData.player_turn
                               )
                               .map((player, index) => (
                                 <DropdownMenuItem

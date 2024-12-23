@@ -1,5 +1,6 @@
 type GameData = {
   player_count: number;
-  active_player: number;
+  player_turn: number;
+  active_players: number;
   players: Player[];
 };
