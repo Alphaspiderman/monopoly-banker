@@ -16,9 +16,10 @@ interface NavbarProps {
 
 export function Navbar({ entries }: NavbarProps) {
   // Get page url
-  let url = "";
-  let defaultClass = "text-sm font-medium transition-colors hover:text-primary";
-  let activeClass = "text-primary";
+  const url = "";
+  const defaultClass =
+    "text-sm font-medium transition-colors hover:text-primary";
+  const activeClass = "text-primary";
   return (
     <div className="hidden flex-col md:flex">
       <div className="border-b">

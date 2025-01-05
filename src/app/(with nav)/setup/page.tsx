@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
-import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -44,7 +43,7 @@ export default function GameSetupPage() {
   function onSubmit(data: FormValues) {
     console.log(data);
     // Ensure that there are atleast 2 players
-    var player_count = data.players.length;
+    const player_count = data.players.length;
     if (player_count < 2) {
       alert("Please add atleast 2 players");
       return;
@@ -57,7 +56,7 @@ export default function GameSetupPage() {
     }
 
     // Create game data
-    var gameData: GameData = {
+    const gameData: GameData = {
       player_count: player_count,
       player_turn: 0,
       active_players: player_count,
@@ -65,7 +64,7 @@ export default function GameSetupPage() {
     };
 
     // Add players to the game data
-    for (var i = 0; i < player_count; i++) {
+    for (let i = 0; i < player_count; i++) {
       gameData.players.push({
         id: i,
         name: data.players[i].value,
