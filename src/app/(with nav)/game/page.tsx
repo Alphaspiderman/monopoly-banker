@@ -9,60 +9,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-
 import { Button } from "@/components/ui/button";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const FormSchema = z.object({
-  amount: z.number().int().positive(),
-  player: z.number().int(),
-});
+import { PaymentModal } from "@/components/custom/paymentModal";
 
 export default function GamePage() {
   const [gameData, setGameData] = useState<GameData | null>(null);
-
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-  });
-
-  function onSubmitPay(data: z.infer<typeof FormSchema>) {
-    console.log(data);
-    transferMoney(gameData!.player_turn, data.player, data.amount);
-  }
-
-  function onSubmitCollect(data: z.infer<typeof FormSchema>) {
-    console.log(data);
-    transferMoney(gameData!.player_turn, data.player, -data.amount);
-  }
 
   // Load game data from localStorage on component mount
   useEffect(() => {
@@ -96,56 +49,10 @@ export default function GamePage() {
     }
   }
 
-  // Function to transfer money between players
-  function transferMoney(from: number, to: number, amount: number) {
-    if (gameData) {
-      var success = true;
-      const players = gameData.players.map((player, index) => {
-        if (index === from) {
-          var newBalance = player.balance - amount;
-          if (newBalance < 0) {
-            alert("Whoops! You don't have enough money to make this payment.");
-            success = false;
-            return player;
-          }
-          return {
-            ...player,
-            balance: newBalance,
-          };
-        }
-
-        if (index === to) {
-          var newBalance = player.balance + amount;
-          if (newBalance < 0) {
-            alert("Whoops! You don't have enough money to make this payment.");
-            success = false;
-            return player;
-          }
-          return {
-            ...player,
-            balance: player.balance + amount,
-          };
-        }
-
-        return player;
-      });
-
-      if (success) {
-        const updatedGameData = {
-          ...gameData,
-          players: players,
-        };
-
-        localStorage.setItem("gameData", JSON.stringify(updatedGameData));
-        setGameData(updatedGameData);
-      }
-    }
-  }
-
   // Mark the player as active based on the active_player index in the gameData
   const highlightActivePlayer = (
     players: Player[],
-    activePlayerIndex: number
+    activePlayerIndex: number,
   ) => {
     return players.map((player, index) => ({
       ...player,
@@ -176,7 +83,7 @@ export default function GamePage() {
               {gameData?.players &&
                 highlightActivePlayer(
                   gameData.players,
-                  gameData.player_turn
+                  gameData.player_turn,
                 ).map((player, index) => (
                   <TableRow
                     key={index}
@@ -193,18 +100,22 @@ export default function GamePage() {
           </Table>
         </div>
         <div className="flex space-x-4">
-          {showPaymentModal(
-            "Pay Money",
-            "Paying Money",
-            "Player will be paying a player. Please provide the information below.",
-            onSubmitPay
-          )}
-          {showPaymentModal(
-            "Collect Money",
-            "Collecting Money",
-            "Player will be collecting money from a player. Please provide the information below.",
-            onSubmitCollect
-          )}
+          <PaymentModal
+            title="Paying Money"
+            trigger="Pay Money"
+            description="Player will be paying a player. Please provide the information below."
+            type="pay"
+            gameData={gameData!}
+            setGameData={setGameData}
+          />
+          <PaymentModal
+            title="Collecting Money"
+            trigger="Collect Money"
+            description="Player will be collecting money from a player. Please provide the information below."
+            type="collect"
+            gameData={gameData!}
+            setGameData={setGameData}
+          />
 
           <Button
             variant="destructive"
@@ -219,96 +130,4 @@ export default function GamePage() {
       </div>
     </main>
   );
-
-  function showPaymentModal(
-    trigger: string,
-    title: string,
-    description: string,
-    onSubmit: (data: z.infer<typeof FormSchema>) => void
-  ) {
-    return (
-      <Dialog>
-        <DialogTrigger>{trigger}</DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{description}</DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="player"
-                render={({ field }) => (
-                  <>
-                    <FormItem>
-                      <FormLabel>Player</FormLabel>
-                      <FormControl>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button className="w-full text-left">
-                              {field.value === -1
-                                ? "Bank"
-                                : gameData?.players[field.value]?.name ||
-                                  "Select a player"}
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem
-                              onSelect={() => field.onChange(-1)}
-                            >
-                              Bank
-                            </DropdownMenuItem>
-                            {gameData?.players
-                              .filter(
-                                (_, index) => index !== gameData.player_turn
-                              )
-                              .map((player, index) => (
-                                <DropdownMenuItem
-                                  key={player.id}
-                                  onSelect={() => field.onChange(player.id)}
-                                >
-                                  {player.name}
-                                </DropdownMenuItem>
-                              ))}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  </>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => {
-                  return (
-                    <>
-                      <FormItem>
-                        <FormLabel>Amount</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="number"
-                            onChange={(e) => {
-                              field.onChange(parseInt(e.target.value));
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    </>
-                  );
-                }}
-              />
-              <DialogClose asChild>
-                <Button type="submit">Submit</Button>
-              </DialogClose>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-    );
-  }
 }
