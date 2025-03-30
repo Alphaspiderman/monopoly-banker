@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 
 const formSchema = z.object({
   inital_balance: z.number().int().positive().min(500),
@@ -88,6 +89,42 @@ export default function GameSetupPage() {
         backgroundSize: "cover",
       }}
     >
+      {localStorage.getItem("gameData") ? renderGameActive() : renderForm()}
+    </main>
+  );
+
+  function renderGameActive() {
+    return (
+      <div className="w-full h-full flex flex-col justify-center items-center dark:bg-black dark:bg-opacity-50 bg-white bg-opacity-10">
+        <h1 className="text-4xl font-bold mb-8">Game Active</h1>
+        <p className="text-lg mb-4">
+          A game is already active. Please finish the current game before
+          starting a new one.
+        </p>
+        <div className="row-auto space-x-4">
+          <Button asChild>
+            <Link href="/game">Continue Game</Link>
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              // Reset Game Data
+              console.log("Reset Data button clicked");
+              // Save the game to localStorage
+              localStorage.removeItem("gameData");
+              // Update state with the new game data
+              window.location.reload();
+            }}
+          >
+            Reset Data
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  function renderForm() {
+    return (
       <div className="w-full h-full flex flex-col justify-center items-center dark:bg-black dark:bg-opacity-50 bg-white bg-opacity-10">
         <h1 className="text-4xl font-bold mb-8">Game Setup</h1>
         <Form {...form}>
@@ -125,8 +162,8 @@ export default function GameSetupPage() {
           </form>
         </Form>
       </div>
-    </main>
-  );
+    );
+  }
 
   function renderTwoColumns() {
     return (
