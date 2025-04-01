@@ -143,7 +143,7 @@ export function PaymentModal(props: PaymentModalProps) {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(
-              props.type === "pay" ? onSubmitPay : onSubmitCollect
+              props.type === "pay" ? onSubmitPay : onSubmitCollect,
             )}
             className="space-y-6"
           >
@@ -176,7 +176,8 @@ export function PaymentModal(props: PaymentModalProps) {
                           </DropdownMenuItem>
                           {props.gameData.players
                             .filter(
-                              (_, index) => index !== props.gameData.player_turn
+                              (_, index) =>
+                                index !== props.gameData.player_turn,
                             )
                             .map((player) => (
                               <DropdownMenuItem
@@ -213,7 +214,7 @@ export function PaymentModal(props: PaymentModalProps) {
                           value={field.value || ""}
                           onChange={(e) => {
                             field.onChange(
-                              e.target.value ? parseInt(e.target.value) : ""
+                              e.target.value ? parseInt(e.target.value) : "",
                             );
                           }}
                         />
